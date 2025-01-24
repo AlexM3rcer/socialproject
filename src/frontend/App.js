@@ -1,4 +1,5 @@
 import React from 'react';
+import Map from './Map';
 
 function App() {
     return (
@@ -9,8 +10,9 @@ function App() {
         </header>
         <main>
           <section id="heatmap">
-            {/* Здесь будет тепловая карта */}
-            <div className="placeholder">Тепловая карта будет здесь</div>
+            <div className="placeholder">
+              <Map />   
+            </div>
           </section>
           <section id="infographics">
             {/* Здесь будет инфографика */}
