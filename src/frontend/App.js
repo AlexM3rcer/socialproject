@@ -10,9 +10,7 @@ function App() {
         </header>
         <main>
           <section id="heatmap">
-            <div className="placeholder">
-              <Map />   
-            </div>
+            <Map />   
           </section>
           <section id="infographics">
             {/* Здесь будет инфографика */}
