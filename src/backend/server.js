@@ -13,16 +13,12 @@ const pool = new Pool({
 
 app.use(cors());
 
-app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  next();
-});
 
 // Маршрут для получения данных
 app.get('/api/heritage', async (req, res) => {
   try {
     // Выполняем запрос к базе данных
-    const result = await pool.query("SELECT (jsonb_extract_path(map_position, 'coordinates')->>0)::FLOAT AS lng, (jsonb_extract_path(map_position, 'coordinates')->>1)::FLOAT AS lat, 1 AS value FROM heritage_objects WHERE jsonb_extract_path_text(map_position, 'coordinates') IS NOT NULL;");
+    const result = await pool.query("SELECT (jsonb_extract_path(map_position, 'coordinates')->>1)::FLOAT AS lat, (jsonb_extract_path(map_position, 'coordinates')->>0)::FLOAT AS lng, 1 AS value FROM heritage_objects WHERE jsonb_extract_path_text(map_position, 'coordinates') IS NOT NULL;");
 
     // Отправляем данные клиенту
     res.json(result.rows);
