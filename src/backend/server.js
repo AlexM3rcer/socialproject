@@ -18,7 +18,7 @@ app.use(cors());
 app.get('/api/heritage', async (req, res) => {
   try {
     // Выполняем запрос к базе данных
-    const result = await pool.query("SELECT (jsonb_extract_path(map_position, 'coordinates')->>1)::FLOAT AS lat, (jsonb_extract_path(map_position, 'coordinates')->>0)::FLOAT AS lng, 1 AS value FROM heritage_objects WHERE jsonb_extract_path_text(map_position, 'coordinates') IS NOT NULL;");
+    const result = await pool.query("SELECT (jsonb_extract_path(map_position, 'coordinates')->>1)::FLOAT AS lat, (jsonb_extract_path(map_position, 'coordinates')->>0)::FLOAT AS lng,ROUND(CAST(calculate_value(category_type_id::INT,object_type_id::INT,unesco_id::INT,valued_id::INT,wow_id::INT) AS NUMERIC), 2) AS value FROM heritage_objects WHERE jsonb_extract_path_text(map_position, 'coordinates') IS NOT NULL;");
 
     // Отправляем данные клиенту
     res.json(result.rows);

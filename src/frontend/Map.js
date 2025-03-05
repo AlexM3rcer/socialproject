@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import HeatmapOverlay from 'heatmap.js/plugins/leaflet-heatmap';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import MarkerClusterGroup from 'leaflet.markercluster';
 
 const Map = () => {
     const mapRef = useRef(null);
@@ -77,14 +80,14 @@ const Map = () => {
 
     return (
         <div className="placeholder">
-            <form>
+            <form id='mapSettings'>
                 <div>
-                    <label>Размер свечения (rad):</label>
-                    <input type="number" value={rad} onChange={(e) => setRad(parseFloat(e.target.value))} required />
+                    <label className='mapLabel'>Размер свечения:</label>
+                    <input className='mapInput' type="number" value={rad} onChange={(e) => setRad(parseFloat(e.target.value))} required />
                 </div>
                 <div>
-                    <label>Прозрачность (opac):</label>
-                    <input type="number" step="0.1" value={opac} onChange={(e) => setOpac(parseFloat(e.target.value))} required />
+                    <label className='mapLabel'>Прозрачность:</label>
+                    <input className='mapInput' type="number" step="0.1" value={opac} onChange={(e) => setOpac(parseFloat(e.target.value))} required />
                 </div>
             </form>
             <div ref={mapRef} style={{ width: '100%', height: '600px' }} />
