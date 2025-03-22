@@ -12,6 +12,7 @@ const Map = () => {
     const [opac, setOpac] = useState(0.8);
     const [mapCenter, setMapCenter] = useState([55.76, 37.64]);
     const [mapZoom, setMapZoom] = useState(10);
+    const [isOpen, setIsOpen] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -95,15 +96,27 @@ const Map = () => {
         <div className="placeholder">
             <form id='mapSettings'>
                 <div>
-                    <label className='mapLabel'>Масштаб теплового слоя:</label>
-                    <input className='mapInput' type="number" value={rad} onChange={(e) => setRad(parseFloat(e.target.value))} required />
+                    <div id='mapFilters' onClick={() => setIsOpen(!isOpen)}>
+                        <p>Раскрыть фильтры</p>
+                    </div>
+                    {isOpen && (
+                        <select>
+                            <option>Превед</option>
+                        </select>
+                    )}
                 </div>
-                <div>
-                    <label className='mapLabel'>Прозрачность:</label>
-                    <input className='mapInput' type="number" step="0.1" value={opac} onChange={(e) => setOpac(parseFloat(e.target.value))} required />
+                <div id='heatLayerSettings'>
+                    <div className='mapSettingsCell'>
+                        <label className='mapLabel'>Масштаб теплового слоя:</label>
+                        <input className='mapInput' type="number" step="0.1" value={rad} onChange={(e) => setRad(parseFloat(e.target.value))} required />
+                    </div>
+                    <div className='mapSettingsCell'>
+                        <label className='mapLabel'>Прозрачность:</label>
+                        <input className='mapInput' type="number" step="0.1" value={opac} onChange={(e) => setOpac(parseFloat(e.target.value))} required />
+                    </div>
                 </div>
             </form>
-            <div ref={mapRef} style={{ width: '100%', height: '600px' }} />
+            <div ref={mapRef} style={{ width: '50%', height: '600px' }} />
         </div>
     );
 };

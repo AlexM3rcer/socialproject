@@ -21,8 +21,8 @@ body {
     flex: 1;
     min-height: 100vh;
     padding: 1em;
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: 5%;
+    margin-right: 5%;
   }
   
   .placeholder {
@@ -47,15 +47,22 @@ body {
 
   #mapSettings {
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
     align-items: center;
     margin-bottom: 1em;
   }
 
-  #mapSettings div {
+  #mapSettingsCell {
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  #heatLayerSettings {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
   }
 
   .mapLabel {
