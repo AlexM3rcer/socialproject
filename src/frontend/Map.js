@@ -13,13 +13,15 @@ const Map = () => {
     const [mapCenter, setMapCenter] = useState([55.76, 37.64]);
     const [mapZoom, setMapZoom] = useState(10);
     
-    // Filter states
+    // Состояния для фильтров
     const [objectType, setObjectType] = useState('Все типы');
     const [region, setRegion] = useState('');
+    const [regionSuggestions, setRegionSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const [significanceLevel, setSignificanceLevel] = useState('Любой');
     const [typology, setTypology] = useState('Все');
     
-    // Map and markers references
+    // Состояния для карты 
     const [map, setMap] = useState(null);
     const [heatmapLayer, setHeatmapLayer] = useState(null);
     const [markersGroup, setMarkersGroup] = useState(null);
@@ -50,6 +52,40 @@ const Map = () => {
             console.error('Ошибка при загрузке данных:', error);
             return [];
         }
+    };
+
+    // Функция для поиска регионов
+    const searchRegions = async (query) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/regions?query=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            console.log('Результат поиска регионов:', data);
+            setRegionSuggestions(data);
+            setShowSuggestions(data.length > 0);
+        } catch (error) {
+            console.error('Ошибка при поиске регионов:', error);
+            setRegionSuggestions([]);
+            setShowSuggestions(false);
+        }
+    };
+
+    // Обработчик изменения поля региона
+    const handleRegionChange = (e) => {
+        const value = e.target.value;
+        setRegion(value);
+        
+        if (value.length > 0) {
+            searchRegions(value);
+        } else {
+            setRegionSuggestions([]);
+            setShowSuggestions(false);
+        }
+    };
+
+    // Обработчик выбора региона из списка
+    const handleSelectRegion = (selectedRegion) => {
+        setRegion(selectedRegion);
+        setShowSuggestions(false);
     };
 
     const applyFilters = async () => {
@@ -172,6 +208,18 @@ const Map = () => {
         };
     }, [rad, opac]);
 
+    // Закрыть выпадающий список при клике вне его
+    useEffect(() => {
+        const handleClickOutside = () => {
+            setShowSuggestions(false);
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
+
     return (
         <div className="row">
             {/* Левая колонка с картой и настройками тепловой карты */}
@@ -239,13 +287,34 @@ const Map = () => {
                             </select>
                             
                             <label className="form-label mb-2">Регион:</label>
-                            <input 
-                                type="text" 
-                                className="form-control mb-3" 
-                                placeholder="Введите название региона" 
-                                value={region}
-                                onChange={(e) => setRegion(e.target.value)}
-                            />
+                            <div className="position-relative">
+                                <input 
+                                    type="text" 
+                                    className="form-control mb-3" 
+                                    placeholder="Введите название региона" 
+                                    value={region}
+                                    onChange={handleRegionChange}
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                                {showSuggestions && (
+                                    <div 
+                                        className="position-absolute w-100 bg-white border rounded shadow-sm" 
+                                        style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        {regionSuggestions.map((suggestion, index) => (
+                                            <div 
+                                                key={index} 
+                                                className="p-2 border-bottom cursor-pointer" 
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => handleSelectRegion(suggestion)}
+                                            >
+                                                {suggestion}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
                             <label className="form-label mb-2">Уровень значения:</label>
                             <select 

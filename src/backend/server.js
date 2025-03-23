@@ -85,6 +85,30 @@ app.post('/api/heritage', async (req, res) => {
   }
 });
 
+// Add this new endpoint for region search
+app.get('/api/regions', async (req, res) => {
+  try {
+    const { query } = req.query;
+    let sqlQuery = "SELECT DISTINCT region_value FROM heritage_objects WHERE region_value IS NOT NULL";
+    
+    if (query) {
+      sqlQuery += " AND region_value ILIKE $1";
+    }
+    
+    sqlQuery += " ORDER BY region_value LIMIT 10";
+    
+    const result = await pool.query(
+      sqlQuery,
+      query ? [`%${query}%`] : []
+    );
+    
+    res.json(result.rows.map(row => row.region_value));
+  } catch (err) {
+    console.error('Ошибка при поиске регионов:', err);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 app.listen(5000, () => {
   console.log('Сервер запущен на http://localhost:5000');
 });
