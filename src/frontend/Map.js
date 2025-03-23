@@ -6,7 +6,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.markercluster';
 
-const Map = () => {
+const Map = ({ onDataUpdate }) => {
     const mapRef = useRef(null);
     const [rad, setRad] = useState(0.1);
     const [opac, setOpac] = useState(0.8);
@@ -28,13 +28,16 @@ const Map = () => {
     
     // Добавляем состояние для хранения количества объектов
     const [objectsCount, setObjectsCount] = useState(0);
+    
+    // Состояние для хранения текущих данных
+    const [currentData, setCurrentData] = useState([]);
 
     const fetchData = async (filters = {}) => {
         try {
             // Default method is GET if no filters are provided
             let options = {};
             
-            // If we have filters, use POST method
+            // Если фильтры есть (т.е. они были применены), то добавляем их в запрос
             if (Object.keys(filters).length > 0) {
                 options = {
                     method: 'POST',
@@ -47,6 +50,17 @@ const Map = () => {
             
             const response = await fetch('http://localhost:5000/api/heritage', options);
             const data = await response.json();
+            
+            console.log('Полученные данные:', data);
+
+            // Update the parent component with the fetched data
+            if (onDataUpdate) {
+                onDataUpdate(data);
+            }
+            
+            // Сохраняем текущие данные
+            setCurrentData(data);
+            
             return data;
         } catch (error) {
             console.error('Ошибка при загрузке данных:', error);
@@ -59,7 +73,9 @@ const Map = () => {
         try {
             const response = await fetch(`http://localhost:5000/api/regions?query=${encodeURIComponent(query)}`);
             const data = await response.json();
+
             console.log('Результат поиска регионов:', data);
+
             setRegionSuggestions(data);
             setShowSuggestions(data.length > 0);
         } catch (error) {
@@ -116,22 +132,29 @@ const Map = () => {
             // Обновляем количество найденных объектов
             setObjectsCount(points.length);
             
-            // Update heatmap
-            heatmapLayer.setData({
-                max: 1,
-                data: points,
-            });
-            
-            // Clear existing markers
-            markersGroup.clearLayers();
-            
-            // Add new markers
-            points.forEach(point => {
-                const marker = L.marker([point.lat, point.lng], {icon: customIcon});
-                marker.bindPopup(`<b>${point.name}</b><br>${point.address}`);
-                markersGroup.addLayer(marker);
-            });
+            updateMapLayers(points);
         }
+    };
+
+    // Функция для обновления слоев карты
+    const updateMapLayers = (points) => {
+        if (!heatmapLayer || !markersGroup) return;
+        
+        // Обновляем данные на карте
+        heatmapLayer.setData({
+            max: 1,
+            data: points,
+        });
+        
+        // Чистим предыдущие маркеры
+        markersGroup.clearLayers();
+        
+        // Добавляем новые маркеры
+        points.forEach(point => {
+            const marker = L.marker([point.lat, point.lng], {icon: customIcon});
+            marker.bindPopup(`<b>${point.name}</b><br>${point.address}`);
+            markersGroup.addLayer(marker);
+        });
     };
 
     const customIcon = new L.Icon({
@@ -143,6 +166,7 @@ const Map = () => {
         shadowSize: [41, 41]
     });
 
+    // Инициализация карты (только один раз)
     useEffect(() => {
         var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors',
@@ -186,7 +210,7 @@ const Map = () => {
         setMarkersGroup(markers);
         mapInstance.addLayer(markers);
 
-        // Initial data load without filters
+        // Инициализируем загрузку данных
         fetchData().then(points => {
             // Обновляем количество найденных объектов при первой загрузке
             setObjectsCount(points.length);
@@ -198,6 +222,7 @@ const Map = () => {
 
             points.forEach(point => {
                 const marker = L.marker([point.lat, point.lng], {icon: customIcon});
+
                 marker.bindPopup(`<b>${point.name}</b><br>${point.address}`);
                 markers.addLayer(marker);
             });
@@ -206,7 +231,24 @@ const Map = () => {
         return () => {
             mapInstance.remove();
         };
-    }, [rad, opac]);
+    }, []); // Пустой массив зависимостей - инициализация только один раз
+
+    // Отдельный эффект для обновления настроек тепловой карты
+    useEffect(() => {
+        if (heatmapLayer) {
+            // Обновляем настройки тепловой карты
+            heatmapLayer.cfg.radius = rad;
+            heatmapLayer.cfg.maxOpacity = opac;
+            
+            // Перерисовываем тепловую карту с текущими данными
+            if (currentData.length > 0) {
+                heatmapLayer.setData({
+                    max: 1,
+                    data: currentData,
+                });
+            }
+        }
+    }, [rad, opac, heatmapLayer]);
 
     // Закрыть выпадающий список при клике вне его
     useEffect(() => {

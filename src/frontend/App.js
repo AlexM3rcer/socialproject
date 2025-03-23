@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Map from './Map';
 import Instructions from './Instructions';
+import InfoGraphics from './InfoGraphics';
 
 function App() {
+    const [heritageObjects, setHeritageObjects] = useState([]);
+
+    const updateHeritageObjects = (objects) => {
+      setHeritageObjects(objects);
+    };
+
     return (
       <div className="container-fluid p-0 d-flex flex-column min-vh-100">
         <header className="bg-dark text-white py-4">
@@ -25,7 +32,7 @@ function App() {
                   <h2 className="h4 mb-0">Карта объектов</h2>
                 </div>
                 <div className="card-body">
-                  <Map />
+                  <Map onDataUpdate={updateHeritageObjects} />
                 </div>
               </div>
             </section>
@@ -36,9 +43,7 @@ function App() {
                   <h2 className="h4 mb-0">Инфографика</h2>
                 </div>
                 <div className="card-body">
-                  <div className="placeholder p-5 bg-light text-center rounded">
-                    Инфографика будет здесь
-                  </div>
+                  <InfoGraphics heritageObjects={heritageObjects} />
                 </div>
               </div>
             </section>

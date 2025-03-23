@@ -17,8 +17,25 @@ app.use(express.json());
 // Маршрут для получения данных без фильтров
 app.get('/api/heritage', async (req, res) => {
   try {
+    let query = `
+      SELECT 
+        (jsonb_extract_path(map_position, 'coordinates')->>1)::FLOAT AS lat, 
+        (jsonb_extract_path(map_position, 'coordinates')->>0)::FLOAT AS lng,
+        ROUND(CAST(calculate_value(category_type_id::INT,object_type_id::INT,unesco_id::INT,valued_id::INT,wow_id::INT) AS NUMERIC), 2) AS value, 
+        object_name AS name, 
+        full_address AS address,
+        object_type_value,
+        region_value,
+        category_type_value,
+        typologies->0->>'value' AS typology,
+        (jsonb_extract_path(photo, 'url')) AS photo_url,
+        create_date,
+        security_info
+      FROM heritage_objects 
+      WHERE jsonb_extract_path_text(map_position, 'coordinates') IS NOT NULL
+    `;
     // Выполняем запрос к базе данных
-    const result = await pool.query("SELECT (jsonb_extract_path(map_position, 'coordinates')->>1)::FLOAT AS lat, (jsonb_extract_path(map_position, 'coordinates')->>0)::FLOAT AS lng,ROUND(CAST(calculate_value(category_type_id::INT,object_type_id::INT,unesco_id::INT,valued_id::INT,wow_id::INT) AS NUMERIC), 2) AS value, object_name AS name, full_address AS address FROM heritage_objects WHERE jsonb_extract_path_text(map_position, 'coordinates') IS NOT NULL;");
+    const result = await pool.query(query);
 
     // Отправляем данные клиенту
     res.json(result.rows);
@@ -45,7 +62,10 @@ app.post('/api/heritage', async (req, res) => {
         object_type_value,
         region_value,
         category_type_value,
-        typologies->0->>'value'
+        typologies->0->>'value' AS typology,
+        (jsonb_extract_path(photo, 'url')) AS photo_url,
+        create_date,
+        security_info
       FROM heritage_objects 
       WHERE jsonb_extract_path_text(map_position, 'coordinates') IS NOT NULL
     `;
@@ -70,7 +90,7 @@ app.post('/api/heritage', async (req, res) => {
     
     if (typology) {
       queryParams.push(typology);
-      query += ` AND typologies->0->>'value' = $${queryParams.length}`;
+      query += ` AND typology = $${queryParams.length}`;
     }
     
     // Выполняем запрос с параметрами
