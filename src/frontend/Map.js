@@ -124,7 +124,7 @@ const Map = ({ onDataUpdate }) => {
             filters.typology = typology;
         }
         
-        // Only make the request if we have map and layers initialized
+        
         if (map && heatmapLayer && markersGroup) {
             // Fetch data with filters
             const points = await fetchData(filters);
