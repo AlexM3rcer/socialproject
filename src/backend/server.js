@@ -71,26 +71,27 @@ app.post('/api/heritage', async (req, res) => {
     `;
     
     const queryParams = [];
+    let paramCounter = 1;
     
     // Добавляем условия фильтрации, если они предоставлены
     if (type) {
       queryParams.push(type);
-      query += ` AND object_type_value = $${queryParams.length}`;
+      query += ` AND object_type_value = $${paramCounter++}`;
     }
     
     if (region) {
       queryParams.push(`%${region}%`);
-      query += ` AND region_value ILIKE $${queryParams.length}`;
+      query += ` AND region_value ILIKE $${paramCounter++}`;
     }
     
     if (significanceLevel) {
       queryParams.push(significanceLevel);
-      query += ` AND category_type_value = $${queryParams.length}`;
+      query += ` AND category_type_value = $${paramCounter++}`;
     }
     
     if (typology) {
       queryParams.push(typology);
-      query += ` AND typology = $${queryParams.length}`;
+      query += ` AND typologies->0->>'value' = $${paramCounter++}`;
     }
     
     // Выполняем запрос с параметрами
@@ -100,7 +101,6 @@ app.post('/api/heritage', async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error('Ошибка при выполнении запроса с фильтрами:', err);
-
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 });

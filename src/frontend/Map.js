@@ -140,6 +140,12 @@ const Map = ({ onDataUpdate }) => {
     const updateMapLayers = (points) => {
         if (!heatmapLayer || !markersGroup) return;
         
+        // Проверка
+        if (!Array.isArray(points)) {
+            console.error('Expected points to be an array but got:', points);
+            return;
+        }
+        
         // Обновляем данные на карте
         heatmapLayer.setData({
             max: 1,
@@ -267,8 +273,8 @@ const Map = ({ onDataUpdate }) => {
             {/* Левая колонка с картой и настройками тепловой карты */}
             <div className="col-md-8">
                 {/* Настройки тепловой карты */}
-                <div className="card mb-3">
-                    <div className="card-header bg-light">
+                <div className="card mb-3" style={{ borderColor: '#FF493E' }}>
+                    <div className="card-header" style={{ backgroundColor: '#FF493E', color: 'white' }}>
                         <h5 className="mb-0">Настройки тепловой карты</h5>
                     </div>
                     <div className="card-body">
@@ -278,6 +284,7 @@ const Map = ({ onDataUpdate }) => {
                                 <input 
                                     type="number" 
                                     className="form-control" 
+                                    style={{ borderColor: '#493EFF' }}
                                     step="0.1" 
                                     value={rad} 
                                     onChange={(e) => setRad(parseFloat(e.target.value))} 
@@ -289,6 +296,7 @@ const Map = ({ onDataUpdate }) => {
                                 <input 
                                     type="number" 
                                     className="form-control" 
+                                    style={{ borderColor: '#493EFF' }}
                                     step="0.1" 
                                     value={opac} 
                                     onChange={(e) => setOpac(parseFloat(e.target.value))} 
@@ -303,14 +311,14 @@ const Map = ({ onDataUpdate }) => {
                 <div 
                     ref={mapRef} 
                     className="border rounded shadow-sm" 
-                    style={{ width: '100%', height: '600px' }} 
+                    style={{ width: '100%', height: '600px', borderColor: '#3eff49' }} 
                 />
             </div>
             
             {/* Правая колонка с фильтрами */}
             <div className="col-md-4">
-                <div className="card h-100">
-                    <div className="card-header bg-light">
+                <div className="card h-100" style={{ borderColor: '#3eff49' }}>
+                    <div className="card-header" style={{ backgroundColor: '#3eff49', color: 'black' }}>
                         <h5 className="mb-0">Фильтры</h5>
                     </div>
                     
@@ -319,6 +327,7 @@ const Map = ({ onDataUpdate }) => {
                             <label className="form-label mb-2">Выберите тип объекта:</label>
                             <select 
                                 className="form-select mb-3"
+                                style={{ borderColor: '#493EFF' }}
                                 value={objectType}
                                 onChange={(e) => setObjectType(e.target.value)}
                             >
@@ -333,6 +342,7 @@ const Map = ({ onDataUpdate }) => {
                                 <input 
                                     type="text" 
                                     className="form-control mb-3" 
+                                    style={{ borderColor: '#493EFF' }}
                                     placeholder="Введите название региона" 
                                     value={region}
                                     onChange={handleRegionChange}
@@ -341,14 +351,14 @@ const Map = ({ onDataUpdate }) => {
                                 {showSuggestions && (
                                     <div 
                                         className="position-absolute w-100 bg-white border rounded shadow-sm" 
-                                        style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}
+                                        style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto', borderColor: '#ff493e' }}
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         {regionSuggestions.map((suggestion, index) => (
                                             <div 
                                                 key={index} 
                                                 className="p-2 border-bottom cursor-pointer" 
-                                                style={{ cursor: 'pointer' }}
+                                                style={{ cursor: 'pointer', borderColor: '#493EFF' }}
                                                 onClick={() => handleSelectRegion(suggestion)}
                                             >
                                                 {suggestion}
@@ -361,6 +371,7 @@ const Map = ({ onDataUpdate }) => {
                             <label className="form-label mb-2">Уровень значения:</label>
                             <select 
                                 className="form-select mb-3"
+                                style={{ borderColor: '#493EFF' }}
                                 value={significanceLevel}
                                 onChange={(e) => setSignificanceLevel(e.target.value)}
                             >
@@ -373,6 +384,7 @@ const Map = ({ onDataUpdate }) => {
                             <label className="form-label mb-2">Типология:</label>
                             <select 
                                 className="form-select mb-3"
+                                style={{ borderColor: '#493EFF' }}
                                 value={typology}
                                 onChange={(e) => setTypology(e.target.value)}
                             >
@@ -384,7 +396,8 @@ const Map = ({ onDataUpdate }) => {
                             </select>
                             
                             <button 
-                                className="btn btn-primary w-100 mb-3"
+                                className="btn w-100 mb-3"
+                                style={{ backgroundColor: '#3eff49', color: 'black', borderColor: '#3eff49' }}
                                 onClick={applyFilters}
                                 type="button"
                             >
@@ -392,7 +405,7 @@ const Map = ({ onDataUpdate }) => {
                             </button>
                             
                             {/* Добавляем информацию о количестве найденных объектов */}
-                            <div className="alert alert-info text-center">
+                            <div className="alert text-center" style={{ backgroundColor: '#493EFF', color: 'white' }}>
                                 Найдено {objectsCount} объектов
                             </div>
                         </div>
