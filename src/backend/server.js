@@ -105,7 +105,7 @@ app.post('/api/heritage', async (req, res) => {
   }
 });
 
-// Add this new endpoint for region search
+// Получение регионов для живого поиска
 app.get('/api/regions', async (req, res) => {
   try {
     const { query } = req.query;

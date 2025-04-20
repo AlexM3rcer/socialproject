@@ -34,7 +34,7 @@ const Map = ({ onDataUpdate }) => {
 
     const fetchData = async (filters = {}) => {
         try {
-            // Default method is GET if no filters are provided
+            // Если нет фильтров
             let options = {};
             
             // Если фильтры есть (т.е. они были применены), то добавляем их в запрос
@@ -107,7 +107,7 @@ const Map = ({ onDataUpdate }) => {
     const applyFilters = async () => {
         // Create filters object with only non-empty values
         const filters = {};
-        
+            
         if (objectType !== 'Все типы') {
             filters.type = objectType;
         }

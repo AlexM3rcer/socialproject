@@ -7,7 +7,7 @@ const InfoGraphics = ({ heritageObjects }) => {
   const [filteredObjects, setFilteredObjects] = useState([]);
   const itemsPerPage = 25;
 
-  // Filter objects when search term or heritage objects change
+  // Фильтруем объекты
   useEffect(() => {
     if (!heritageObjects) {
       setFilteredObjects([]);
@@ -26,7 +26,7 @@ const InfoGraphics = ({ heritageObjects }) => {
       setFilteredObjects(filtered);
     }
     
-    // Reset to first page when search results change
+    // Вовзращаемся к 1-ой странице
     setCurrentPage(1);
   }, [searchTerm, heritageObjects]);
 
@@ -92,13 +92,13 @@ const InfoGraphics = ({ heritageObjects }) => {
       );
     }
 
-    // Calculate pagination
+    // Считаем пагинацию
     const totalPages = Math.ceil(filteredObjects.length / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredObjects.slice(indexOfFirstItem, indexOfLastItem);
 
-    // Change page
+    // Меняем страницу
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
@@ -188,10 +188,10 @@ const InfoGraphics = ({ heritageObjects }) => {
                 </button>
               </li>
               
-              {/* Show limited page numbers with ellipsis */}
+              {/* показываем номера страниц */}
               {[...Array(totalPages)].map((_, i) => {
                 const pageNum = i + 1;
-                // Show first page, last page, current page and pages around current page
+                // Показываем первую, последнюю и +-2 страницы
                 if (
                   pageNum === 1 || 
                   pageNum === totalPages || 
