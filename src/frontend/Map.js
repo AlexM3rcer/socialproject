@@ -248,13 +248,20 @@ const Map = ({ onDataUpdate }) => {
             
             // Перерисовываем тепловую карту с текущими данными
             if (currentData.length > 0) {
+                // Принудительно перерисовываем тепловую карту
+                heatmapLayer._heatmap.configure({
+                    radius: rad,
+                    maxOpacity: opac
+                });
+                
+                // Обновляем данные для перерисовки
                 heatmapLayer.setData({
                     max: 1,
                     data: currentData,
                 });
             }
         }
-    }, [rad, opac, heatmapLayer]);
+    }, [rad, opac, heatmapLayer, currentData]);
 
     // Закрыть выпадающий список при клике вне его
     useEffect(() => {
